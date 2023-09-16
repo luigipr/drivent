@@ -24,7 +24,7 @@ export type cep = {
   siafi: string;
 };
 
-export type adress = Omit<cep, 'cep' | 'ibge' | 'gia' | 'ddd' | 'siafi'>;
+export type address = Omit<cep, 'cep' | 'ibge' | 'gia' | 'ddd' | 'siafi'>;
 
 export type cepError = {
   erro: boolean;
