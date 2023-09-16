@@ -1,18 +1,30 @@
 import { Address, Enrollment } from '@prisma/client';
+import { AxiosResponse } from 'axios';
 import { request } from '@/utils/request';
 import { notFoundError } from '@/errors';
 import { addressRepository, CreateAddressParams, enrollmentRepository, CreateEnrollmentParams } from '@/repositories';
 import { exclude } from '@/utils/prisma-utils';
+import { validButInexistentError } from '@/errors/validButInexistent';
+import { adress } from '@/protocols';
 
 // TODO - Receber o CEP por parâmetro nesta função.
-async function getAddressFromCEP() {
+async function getAddressFromCEP(cep: string): Promise<adress> {
   // FIXME: está com CEP fixo!
-  const result = await request.get(`${process.env.VIA_CEP_API}/37440000/json/`);
+  const result: AxiosResponse = await request.get(`${process.env.VIA_CEP_API}/${cep}/json/`);
 
+  if (result.data.erro) {
+    throw validButInexistentError('cep');
+  }
+
+  const { logradouro, complemento, bairro, localidade, uf } = result.data;
   // TODO: Tratar regras de negócio e lanças eventuais erros
+  if (!logradouro || !complemento || !bairro || !localidade || !uf) {
+    throw validButInexistentError('cep');
+  }
 
   // FIXME: não estamos interessados em todos os campos
-  return result.data;
+  const adress: adress = { logradouro, complemento, bairro, localidade, uf };
+  return adress;
 }
 
 async function getOneWithAddressByUserId(userId: number): Promise<GetOneWithAddressByUserIdResult> {
