@@ -1,11 +1,19 @@
 import { Address, Enrollment } from '@prisma/client';
 import { AxiosResponse } from 'axios';
 import { request } from '@/utils/request';
-import { notFoundError } from '@/errors';
+//import { notFoundError } from '@/errors';
 import { addressRepository, CreateAddressParams, enrollmentRepository, CreateEnrollmentParams } from '@/repositories';
 import { exclude } from '@/utils/prisma-utils';
 import { validButInexistentError } from '@/errors/validButInexistent';
-import { address } from '@/protocols';
+import { cep } from '@/protocols';
+
+type NewCEP = {
+  logradouro: string;
+  complemento: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
+};
 
 async function validateCEP(cep: string) {
   const result: AxiosResponse = await request.get(`${process.env.VIA_CEP_API}/${cep}/json/`);
@@ -23,12 +31,13 @@ async function validateCEP(cep: string) {
 }
 
 // TODO - Receber o CEP por parâmetro nesta função.
-async function getAddressFromCEP(cep: string): Promise<address> {
+async function getAddressFromCEP(cep: string): Promise<NewCEP> {
   // FIXME: está com CEP fixo!
-  const result: AxiosResponse = await validateCEP(cep);
+  const result: cep = await validateCEP(cep);
+  //const cidade = result.localidade;
 
-  const { logradouro, complemento, bairro, localidade, uf } = result.data;
-
+  const { logradouro, complemento, bairro, localidade, uf } = result;
+  const cidade = localidade;
   // if (result.data.erro) {
   //   throw validButInexistentError('cep');
   // }
@@ -39,14 +48,14 @@ async function getAddressFromCEP(cep: string): Promise<address> {
   // }
 
   // FIXME: não estamos interessados em todos os campos
-  const address: address = { logradouro, complemento, bairro, localidade, uf };
+  const address: NewCEP = { logradouro, complemento, bairro, cidade, uf };
   return address;
 }
 
 async function getOneWithAddressByUserId(userId: number): Promise<GetOneWithAddressByUserIdResult> {
   const enrollmentWithAddress = await enrollmentRepository.findWithAddressByUserId(userId);
 
-  if (!enrollmentWithAddress) throw notFoundError();
+  if (!enrollmentWithAddress) throw validButInexistentError('enrollment');
 
   const [firstAddress] = enrollmentWithAddress.Address;
   const address = getFirstAddress(firstAddress);
