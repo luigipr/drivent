@@ -7,20 +7,36 @@ import { exclude } from '@/utils/prisma-utils';
 import { validButInexistentError } from '@/errors/validButInexistent';
 import { address } from '@/protocols';
 
+async function validateCEP(cep: string) {
+  const result: AxiosResponse = await request.get(`${process.env.VIA_CEP_API}/${cep}/json/`);
+
+  if (result.status === 200) {
+    if (result.data.erro === true) {
+      throw validButInexistentError('cep');
+    } else {
+      return result.data;
+    }
+  } else if (result.status === 400) {
+    throw validButInexistentError('cep');
+  }
+  return result.data;
+}
+
 // TODO - Receber o CEP por parâmetro nesta função.
 async function getAddressFromCEP(cep: string): Promise<address> {
   // FIXME: está com CEP fixo!
-  const result: AxiosResponse = await request.get(`${process.env.VIA_CEP_API}/${cep}/json/`);
-
-  if (result.data.erro) {
-    throw validButInexistentError('cep');
-  }
+  const result: AxiosResponse = await validateCEP(cep);
 
   const { logradouro, complemento, bairro, localidade, uf } = result.data;
+
+  // if (result.data.erro) {
+  //   throw validButInexistentError('cep');
+  // }
+
   // TODO: Tratar regras de negócio e lanças eventuais erros
-  if (!logradouro || !complemento || !bairro || !localidade || !uf) {
-    throw validButInexistentError('cep');
-  }
+  // if (!logradouro || !complemento || !bairro || !localidade || !uf) {
+  //   throw validButInexistentError('cep');
+  // }
 
   // FIXME: não estamos interessados em todos os campos
   const address: address = { logradouro, complemento, bairro, localidade, uf };
@@ -57,7 +73,8 @@ async function createOrUpdateEnrollmentWithAddress(params: CreateOrUpdateEnrollm
   const address = getAddressForUpsert(params.address);
 
   // TODO - Verificar se o CEP é válido antes de associar ao enrollment.
-  getAddressFromCEP(address.cep);
+  //getAddressFromCEP(address.cep);
+  await validateCEP(params.address.cep);
 
   const newEnrollment = await enrollmentRepository.upsert(params.userId, enrollment, exclude(enrollment, 'userId'));
 
