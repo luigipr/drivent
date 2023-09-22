@@ -1,6 +1,8 @@
+import { Prisma } from '@/config';
 
-
-
+async function name(params:type) {
+    
+}
 
 
 

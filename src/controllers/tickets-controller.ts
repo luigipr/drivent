@@ -15,10 +15,17 @@ async function ticketPost(req: Request, res: Response) {
 }
 
 async function getTicketsType(req: Request, res: Response) {
-  const ticketTypes: TicketType[] = ticketsService.getTicketsTypes();
+  const ticketTypes: TicketType[] = await ticketsService.getTicketsTypes();
 
-  return ticketTypes; res.status(httpStatus.OK)
+  return res.status(httpStatus.OK).send(ticketTypes);
 }
 //await prisma.ticketType.findMany();
 
-export const ticketsController = { getTicketsType, ticketPost }
+async function getTickets(req: Request, res: Response) {
+  const { token } = req.headers;
+
+  const userTickets = await ticketsService.getUserTickets();
+  res.status(httpStatus.OK).send(userTickets);
+}
+
+export const ticketsController = { getTicketsType, ticketPost, getTickets };
