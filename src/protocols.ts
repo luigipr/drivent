@@ -29,3 +29,19 @@ export type address = Omit<cep, 'cep' | 'ibge' | 'gia' | 'ddd' | 'siafi'>;
 export type cepError = {
   erro: boolean;
 };
+
+export type ViaCEPAddressError = {
+  error: boolean;
+};
+
+export type AddressEnrollment = {
+  logradouro: string;
+  complemento: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
+};
+
+export type CEP = {
+  cep: string;
+};
