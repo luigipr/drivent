@@ -4,6 +4,8 @@ import { AuthenticatedRequest } from '@/middlewares';
 import { CreateTicket, ticketsService } from '@/services';
 import { invalidDataError } from '@/errors';
 
+export type CreateTicketParams = { ticketTypeId: number };
+
 async function postTicket(req: AuthenticatedRequest, res: Response) {
   const { ticketTypeId } = req.body as CreateTicket;
   if (!ticketTypeId) throw invalidDataError('"ticket type not found');

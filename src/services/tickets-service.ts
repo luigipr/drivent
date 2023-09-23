@@ -1,7 +1,8 @@
 import { Ticket, TicketStatus, TicketType } from '@prisma/client';
 import { notFoundError } from '@/errors';
-import { ticketsRepository } from '@/repositories';
+import { enrollmentRepository, ticketsRepository } from '@/repositories';
 
+export type CreateTicketParams = { ticketTypeId: number };
 export type CreateTicket = Omit<Ticket, 'id'>;
 export type CreateTicketForPost = Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>;
 
@@ -10,12 +11,12 @@ async function getTicketsType(): Promise<TicketType[]> {
   return tickets;
 }
 
-async function getUserTicket(id: number) {
-  const enrollment = await ticketsRepository.checkEnrollment(id);
+async function getUserTicket(userId: number) {
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) throw notFoundError();
-  const Ticket = await ticketsRepository.checkTicket(enrollment.id);
-  if (!Ticket) throw notFoundError();
-  const userTicket = await ticketsRepository.getUserTicket(id);
+
+  const userTicket = await ticketsRepository.getUserTicket(enrollment.id);
+  if (!userTicket) throw notFoundError();
   return userTicket;
 }
 
@@ -24,10 +25,10 @@ async function postTicket(userId: number, ticketTypeId: number) {
   //if (!enrollment) throw invalidDataError('no enrollments found');
   if (!enrollment) throw notFoundError();
 
-  await ticketsRepository.postTicket(ticketTypeId, enrollment.id);
+  const userEnrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+  if (!userEnrollment) throw notFoundError();
 
-  const ticket = await ticketsRepository.getUserTicket(enrollment.id);
-  return ticket;
+  return await ticketsRepository.postTicket(userId, ticketTypeId);
 }
 
 export const ticketsService = { getTicketsType, getUserTicket, postTicket };

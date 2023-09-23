@@ -9,36 +9,14 @@ async function getTicketTypes() {
 
 async function getUserTicket(id: number) {
   const userTicket = await prisma.ticket.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      status: true,
-      ticketTypeId: true,
-      enrollmentId: true,
-      TicketType: {
-        select: {
-          id: true,
-          name: true,
-          price: true,
-          isRemote: true,
-          includesHotel: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      },
-      createdAt: true,
-      updatedAt: true,
+    include: {
+      TicketType: true,
+    },
+    where: {
+      enrollmentId: id,
     },
   });
   return userTicket;
-}
-
-async function checkEnrollment(userId: number) {
-  return await prisma.enrollment.findUnique({
-    where: {
-      userId,
-    },
-  });
 }
 
 async function checkTicket(enrollmentId: number) {
@@ -63,4 +41,4 @@ async function postTicket(ticketTypeId: number, enrollmentId: number) {
   });
 }
 
-export const ticketsRepository = { getUserTicket, getTicketTypes, checkEnrollment, checkTicket, postTicket };
+export const ticketsRepository = { getUserTicket, getTicketTypes, checkTicket, postTicket };
