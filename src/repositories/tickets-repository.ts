@@ -1,6 +1,6 @@
 //import { Prisma } from '@prisma/client';
 import { prisma } from '@/config';
-import { CreateTicketForPost } from '@/services';
+//import { CreateTicketForPost } from '@/services';
 
 async function getTicketTypes() {
   const ticketTypes = await prisma.ticketType.findMany();
@@ -43,17 +43,23 @@ async function checkEnrollment(userId: number) {
 
 async function checkTicket(enrollmentId: number) {
   return await prisma.ticket.findUnique({
+    include: {
+      TicketType: true,
+    },
     where: {
       enrollmentId,
     },
   });
 }
 
-async function postTicket(ticket: CreateTicketForPost) {
+async function postTicket(ticketTypeId: number, enrollmentId: number) {
   return await prisma.ticket.create({
     data: {
-      ...ticket,
+      enrollmentId,
+      ticketTypeId,
+      status: 'RESERVED',
     },
+    include: { TicketType: true },
   });
 }
 
