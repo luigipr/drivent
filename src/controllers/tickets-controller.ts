@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
+import { AuthenticatedRequest } from '@/middlewares';
 import { ticketsService } from '@/services';
-import { TicketType } from '@prisma/client';
 
-async function ticketPost(req: Request, res: Response) {
+async function postTicket(req: AuthenticatedRequest, res: Response) {
   const { ticketTypeId } = req.body;
 
   const user = await ticketsService.createTicket({ ticketTypeId });
@@ -14,18 +14,18 @@ async function ticketPost(req: Request, res: Response) {
   });
 }
 
-async function getTicketsType(req: Request, res: Response) {
-  const ticketTypes: TicketType[] = await ticketsService.getTicketsTypes();
+async function getTicketsType(req: AuthenticatedRequest, res: Response) {
+  const ticketTypes = await ticketsService.getTicketsType();
 
   return res.status(httpStatus.OK).send(ticketTypes);
 }
 //await prisma.ticketType.findMany();
 
-async function getTickets(req: Request, res: Response) {
-  const { token } = req.headers;
+async function getTickets(req: AuthenticatedRequest, res: Response) {
+  const { ticketTypeId } = req.body;
 
-  const userTickets = await ticketsService.getUserTickets();
+  const userTickets = await ticketsService.getUserTicket(ticketTypeId);
   res.status(httpStatus.OK).send(userTickets);
 }
 
-export const ticketsController = { getTicketsType, ticketPost, getTickets };
+export const ticketsController = { getTicketsType, postTicket, getTickets };

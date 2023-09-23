@@ -32,4 +32,20 @@ async function getUserTicket(id: number) {
   return userTicket;
 }
 
-export const ticketsRepository = { getUserTicket, getTicketTypes };
+async function checkEnrollment(userId: number) {
+  return await prisma.enrollment.findUnique({
+    where: {
+      userId,
+    },
+  });
+}
+
+async function checkTicket(enrollmentId: number) {
+  return await prisma.ticket.findUnique({
+    where: {
+      enrollmentId,
+    },
+  });
+}
+
+export const ticketsRepository = { getUserTicket, getTicketTypes, checkEnrollment, checkTicket };

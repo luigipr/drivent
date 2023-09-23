@@ -1,6 +1,6 @@
 import Joi from 'joi';
-import { CreateTicketsParams } from '@/services/tickets-service';
+import { CreateTicket } from '@/services';
 
-export const createTicketsSchema = Joi.object<CreateTicketsParams>({
+export const createTicketsSchema = Joi.object<CreateTicket>({
   ticketTypeId: Joi.number().required(),
 });
