@@ -1,5 +1,6 @@
 //import { Prisma } from '@prisma/client';
 import { prisma } from '@/config';
+import { CreateTicketForPost } from '@/services';
 
 async function getTicketTypes() {
   const ticketTypes = await prisma.ticketType.findMany();
@@ -48,4 +49,12 @@ async function checkTicket(enrollmentId: number) {
   });
 }
 
-export const ticketsRepository = { getUserTicket, getTicketTypes, checkEnrollment, checkTicket };
+async function postTicket(ticket: CreateTicketForPost) {
+  return await prisma.ticket.create({
+    data: {
+      ...ticket,
+    },
+  });
+}
+
+export const ticketsRepository = { getUserTicket, getTicketTypes, checkEnrollment, checkTicket, postTicket };
