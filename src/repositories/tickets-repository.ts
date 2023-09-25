@@ -30,7 +30,7 @@ async function checkTicket(enrollmentId: number) {
   });
 }
 
-async function postTicket(ticketTypeId: number, enrollmentId: number) {
+async function postTicket(enrollmentId: number, ticketTypeId: number) {
   return await prisma.ticket.create({
     data: {
       enrollmentId,

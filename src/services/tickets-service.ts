@@ -1,5 +1,5 @@
 import { Ticket, TicketStatus, TicketType } from '@prisma/client';
-import { notFoundError } from '@/errors';
+import { conflictError, notFoundError } from '@/errors';
 import { enrollmentRepository, ticketsRepository } from '@/repositories';
 
 export type CreateTicketParams = { ticketTypeId: number };
@@ -21,14 +21,17 @@ async function getUserTicket(userId: number) {
 }
 
 async function postTicket(userId: number, ticketTypeId: number) {
-  const enrollment = await ticketsRepository.checkEnrollment(userId);
+  //const enrollment = await ticketsRepository.checkEnrollment(userId);
   //if (!enrollment) throw invalidDataError('no enrollments found');
-  if (!enrollment) throw notFoundError();
+  //if (!enrollment) throw notFoundError();
+
+  const userhasTicket = await ticketsRepository.getUserTicket(userId);
+  if (userhasTicket) throw conflictError('User already has a ticket');
 
   const userEnrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!userEnrollment) throw notFoundError();
 
-  return await ticketsRepository.postTicket(userId, ticketTypeId);
+  return await ticketsRepository.postTicket(userEnrollment.id, ticketTypeId);
 }
 
 export const ticketsService = { getTicketsType, getUserTicket, postTicket };

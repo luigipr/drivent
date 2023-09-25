@@ -11,7 +11,7 @@ async function postTicket(req: AuthenticatedRequest, res: Response) {
   if (!ticketTypeId) throw invalidDataError('"ticket type not found');
   const { userId } = req;
 
-  const ticket = await ticketsService.postTicket(ticketTypeId, userId);
+  const ticket = await ticketsService.postTicket(userId, ticketTypeId);
 
   if (!ticket) throw invalidDataError('Error submitting ticket');
 
