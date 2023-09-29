@@ -1,5 +1,3 @@
-import { TicketStatus } from '@prisma/client';
-import dayjs from 'dayjs';
 import { notFoundError } from '@/errors';
 import { enrollmentRepository, hotelsRepository, ticketsRepository } from '@/repositories';
 import { paymentRequiredError } from '@/errors/payment-required-error';
