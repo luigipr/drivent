@@ -19,7 +19,7 @@ async function findHotelWithRooms(req: AuthenticatedRequest, res: Response) {
   const id = Number(hotelId);
   await hotelsService.checkUser(userId);
 
-  const hotelWithRooms = hotelsService.findHotelWithRooms(id);
+  const hotelWithRooms = hotelsService.findHotelById(id);
 
   return res.status(httpStatus.OK).send(hotelWithRooms);
 }

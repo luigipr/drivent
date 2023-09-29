@@ -10,26 +10,23 @@ async function checkUser(userId: number) {
 
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
   if (!ticket) throw notFoundError();
-  if (
-    ticket.status !== TicketStatus.PAID ||
-    ticket.TicketType.isRemote === true ||
-    ticket.TicketType.includesHotel === false
-  )
+  if (ticket.status !== 'PAID' || ticket.TicketType.isRemote === true || ticket.TicketType.includesHotel === false)
     throw paymentRequiredError();
 }
 
 async function findHotels() {
-  const hotels = hotelsRepository.findHotels();
+  const hotels = await hotelsRepository.findHotels();
+  if (!hotels || hotels.length === 0) throw notFoundError();
   return hotels;
 }
 
-async function findHotelWithRooms(hotelId: number) {
-  const hotelWithRooms = hotelsRepository.findHotelWithRooms(hotelId);
+async function findHotelById(hotelId: number) {
+  const hotelWithRooms = await hotelsRepository.findHotelById(hotelId);
   return hotelWithRooms;
 }
 
 export const hotelsService = {
   checkUser,
   findHotels,
-  findHotelWithRooms,
+  findHotelById,
 };
