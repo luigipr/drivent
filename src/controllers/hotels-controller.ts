@@ -16,10 +16,10 @@ async function findHotels(req: AuthenticatedRequest, res: Response) {
 async function findHotelWithRooms(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   const { hotelId } = req.params;
-
+  const id = Number(hotelId);
   await hotelsService.checkUser(userId);
 
-  const hotelWithRooms = hotelsService.findHotelWithRooms(hotelId);
+  const hotelWithRooms = hotelsService.findHotelWithRooms(id);
 
   return res.status(httpStatus.OK).send(hotelWithRooms);
 }

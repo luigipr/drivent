@@ -24,8 +24,8 @@ async function findHotels() {
 }
 
 async function findHotelWithRooms(hotelId: number) {
-  const hotelWithRoom = hotelsRepository.findHotelWithRooms(hotelId);
-  return hotelWithRoom;
+  const hotelWithRooms = hotelsRepository.findHotelWithRooms(hotelId);
+  return hotelWithRooms;
 }
 
 export const hotelsService = {
