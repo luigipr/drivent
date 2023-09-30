@@ -1,4 +1,5 @@
 import { prisma } from '@/config';
+import { notFoundError } from '@/errors';
 
 async function findHotels() {
   const result = await prisma.hotel.findMany();
@@ -10,6 +11,7 @@ async function findHotelById(hotelId: number) {
     where: { id: hotelId },
     include: { Rooms: true },
   });
+  if (!result) throw notFoundError();
   return result;
 }
 
