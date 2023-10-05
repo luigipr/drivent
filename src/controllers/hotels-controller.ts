@@ -3,28 +3,17 @@ import httpStatus from 'http-status';
 import { AuthenticatedRequest } from '@/middlewares';
 import { hotelsService } from '@/services';
 
-async function findHotels(req: AuthenticatedRequest, res: Response) {
+export async function getHotels(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
 
-  await hotelsService.checkUser(userId);
-
-  const hotels = await hotelsService.findHotels();
-
-  return res.status(httpStatus.OK).send(hotels);
+  const hotels = await hotelsService.getHotels(userId);
+  res.status(httpStatus.OK).send(hotels);
 }
 
-async function findHotelWithRooms(req: AuthenticatedRequest, res: Response) {
+export async function getHotelsWithRooms(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
-  const { hotelId } = req.params;
-  const id = Number(hotelId);
-  await hotelsService.checkUser(userId);
+  const hotelId = Number(req.params.hotelId);
 
-  const hotelWithRooms = await hotelsService.findHotelById(id);
-
-  return res.status(httpStatus.OK).send(hotelWithRooms);
+  const hotelWithRooms = await hotelsService.getHotelsWithRooms(userId, hotelId);
+  res.status(httpStatus.OK).send(hotelWithRooms);
 }
-
-export const hotelsController = {
-  findHotels,
-  findHotelWithRooms,
-};

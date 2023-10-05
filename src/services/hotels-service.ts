@@ -1,30 +1,43 @@
-import { notFoundError } from '@/errors';
-import { enrollmentRepository, hotelsRepository, ticketsRepository } from '@/repositories';
-import { paymentRequiredError } from '@/errors/payment-required-error';
+import { TicketStatus } from '@prisma/client';
+import { invalidDataError, notFoundError } from '@/errors';
+import { cannotListHotelsError } from '@/errors/cannot-list-hotels-error';
+import { enrollmentRepository, hotelRepository, ticketsRepository } from '@/repositories';
 
-async function checkUser(userId: number) {
+async function validateUserBooking(userId: number) {
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) throw notFoundError();
 
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
   if (!ticket) throw notFoundError();
-  if (ticket.status !== 'PAID' || ticket.TicketType.isRemote === true || ticket.TicketType.includesHotel === false)
-    throw paymentRequiredError();
+
+  const type = ticket.TicketType;
+
+  if (ticket.status === TicketStatus.RESERVED || type.isRemote || !type.includesHotel) {
+    throw cannotListHotelsError();
+  }
 }
 
-async function findHotels() {
-  const hotels = await hotelsRepository.findHotels();
-  if (!hotels || hotels.length === 0) throw notFoundError();
+async function getHotels(userId: number) {
+  await validateUserBooking(userId);
+
+  const hotels = await hotelRepository.findHotels();
+  if (hotels.length === 0) throw notFoundError();
+
   return hotels;
 }
 
-async function findHotelById(hotelId: number) {
-  const hotelWithRooms = await hotelsRepository.findHotelById(hotelId);
+async function getHotelsWithRooms(userId: number, hotelId: number) {
+  await validateUserBooking(userId);
+
+  if (!hotelId || isNaN(hotelId)) throw invalidDataError('hotelId');
+
+  const hotelWithRooms = await hotelRepository.findRoomsByHotelId(hotelId);
+  if (!hotelWithRooms) throw notFoundError();
+
   return hotelWithRooms;
 }
 
 export const hotelsService = {
-  checkUser,
-  findHotels,
-  findHotelById,
+  getHotels,
+  getHotelsWithRooms,
 };
