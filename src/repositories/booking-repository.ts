@@ -8,36 +8,35 @@ export async function getUserBooking(userId: number) {
 }
 
 export async function getRoomById(roomId: number) {
-  return await prisma.room.findUnique({
+  return await prisma.room.findFirst({
     where: { id: roomId },
+    include: { Booking: true },
   });
 }
 
 export async function findBookingsByRoomId(roomId: number) {
   return await prisma.booking.findMany({
     where: { roomId },
+    include: { Room: true },
   });
 }
-
-const currentDate = new Date();
 
 export async function postBookingReservation(userId: number, roomId: number) {
   return await prisma.booking.create({
     data: {
       userId,
       roomId,
-      createdAt: currentDate,
-      updatedAt: currentDate,
     },
+    include: { Room: true },
   });
 }
 
-export async function updateBookReservation(userId: number, roomId: number) {
+export async function updateBookReservation(bookingId: number, roomId: number) {
   return await prisma.booking.update({
-    where: { userId: userId },
+    where: { id: bookingId },
     data: {
-      updatedAt: currentDate,
       roomId: roomId,
     },
+    include: { Room: true },
   });
 }

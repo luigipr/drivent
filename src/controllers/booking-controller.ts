@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import httpStatus from 'http-status';
 import { AuthenticatedRequest } from '@/middlewares';
-import { getBooking, postBooking } from '@/services';
+import { getBooking, postBooking, updateBooking } from '@/services';
 
 export async function getUserBooking(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
@@ -18,4 +18,14 @@ export async function postUserBooking(req: AuthenticatedRequest, res: Response) 
   const booking = await postBooking(roomId, userId);
 
   return res.status(httpStatus.CREATED).send(booking);
+}
+
+export async function updateUserBooking(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req;
+  const bookingId = parseInt(req.params.bookingId);
+  const { roomId } = req.body;
+
+  const bookingUpdated = await updateBooking(userId, bookingId, roomId);
+
+  res.status(httpStatus.OK).send(bookingUpdated);
 }
