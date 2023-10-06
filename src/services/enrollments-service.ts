@@ -6,8 +6,8 @@ import { addressRepository, CreateAddressParams, enrollmentRepository, CreateEnr
 import { exclude } from '@/utils/prisma-utils';
 import { validButInexistentError } from '@/errors/validButInexistent';
 import { cep } from '@/protocols';
-import { enrollmentNotFoundError, invalidCepError } from '@/errors';
-import { AddressEnrollment } from '@/protocols';
+//import { enrollmentNotFoundError, invalidCepError } from '@/errors';
+//import { AddressEnrollment } from '@/protocols';
 
 type NewCEP = {
   logradouro: string;
