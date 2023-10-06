@@ -42,16 +42,14 @@ export async function updateBooking(userId: number, bookingId: number, roomId: n
 async function checkRoom(roomId: number) {
   const room = await getRoomById(roomId);
   if (!room) throw notFoundError();
-  const bookings = await findBookingsByRoomId(roomId);
-  if (room.capacity === bookings.length) throw forbiddenError();
+  //const bookings = await findBookingsByRoomId(roomId);
+  if (room.capacity === room.Booking.length) throw forbiddenError();
 }
 
 async function businessRules(userId: number) {
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
-  if (!enrollment) throw notFoundError();
 
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
-  if (!ticket) throw notFoundError();
   const type = ticket.TicketType;
 
   if (ticket.status === TicketStatus.RESERVED || type.isRemote || !type.includesHotel) {
