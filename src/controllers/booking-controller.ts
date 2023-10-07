@@ -8,9 +8,7 @@ export async function getUserBooking(req: AuthenticatedRequest, res: Response) {
 
   const bookingByUser = await getBooking(userId);
 
-  const answer = { bookingId: bookingByUser.id };
-
-  return res.status(httpStatus.OK).send(answer);
+  return res.status(httpStatus.OK).send(bookingByUser);
 }
 
 export async function postUserBooking(req: AuthenticatedRequest, res: Response) {
@@ -21,7 +19,7 @@ export async function postUserBooking(req: AuthenticatedRequest, res: Response) 
 
   const answer = { bookingId: booking.id };
 
-  return res.status(httpStatus.CREATED).send(answer);
+  return res.status(httpStatus.OK).send(answer);
 }
 
 export async function updateUserBooking(req: AuthenticatedRequest, res: Response) {
