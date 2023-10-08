@@ -40,3 +40,9 @@ export async function updateBookReservation(bookingId: number, roomId: number) {
     include: { Room: true },
   });
 }
+
+export const bookingRepository = {
+  getUserBooking,
+  postBookingReservation,
+  updateBookReservation,
+};
